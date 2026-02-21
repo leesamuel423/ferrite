@@ -1,0 +1,23 @@
+[package]
+name = "ferrite"
+version = "0.1.0"
+edition = "2024"
+description = "UCI chess engine w/ PeSTO eval, transposition tables, and Syzygy endgame support"
+
+[dependencies]
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "search_bench"
+harness = false
+
+[[bench]]
+name = "evaluation_bench"
+harness = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"

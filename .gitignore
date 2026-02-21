@@ -1,0 +1,17 @@
+# Rust build artifacts
+/target
+
+# Syzygy endgame tablebases (large binary data, downloaded separately)
+endgame/
+
+# OS files
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Criterion benchmark output
+target/criterion/
