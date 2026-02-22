@@ -4,6 +4,8 @@ mod board;
 mod evaluation;
 mod movegen;
 mod pst;
+mod search;
+mod syzygy;
 mod tt;
 mod types;
 
