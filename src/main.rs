@@ -1,3 +1,7 @@
+#[allow(dead_code, unused_imports)]
+mod board;
+
 fn main() {
-    println!("Hello, world!");
+    board::init();
+    println!("ferrite initialized");
 }
