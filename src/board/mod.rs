@@ -4,6 +4,7 @@ mod chessmove;
 mod magic;
 mod piece;
 mod square;
+mod zobrist;
 
 pub use bitboard::{BitBoard, EMPTY};
 pub use chessmove::ChessMove;
