@@ -2,6 +2,7 @@
 
 mod board;
 mod evaluation;
+mod movegen;
 mod pst;
 mod tt;
 mod types;
