@@ -1,7 +1,11 @@
-#[allow(dead_code, unused_imports)]
+#![allow(dead_code)]
+
 mod board;
+mod evaluation;
+mod pst;
+mod types;
 
 fn main() {
     board::init();
-    println!("ferrite initialized");
+    println!("Chess engine initialized");
 }
