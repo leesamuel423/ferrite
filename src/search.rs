@@ -105,7 +105,7 @@ fn extract_pv(board: &Board, tt: &TranspositionTable, max_moves: usize) -> Vec<C
 }
 
 /// Format a score for UCI output (centipawns or mate-in-N).
-fn format_score(score: Score) -> String {
+pub fn format_score(score: Score) -> String {
     if score.abs() > SCORE_MATE - 100 {
         let mate_ply = SCORE_MATE - score.abs();
         let mate_moves = (mate_ply + 1) / 2;
@@ -123,11 +123,15 @@ fn format_score(score: Score) -> String {
 pub fn search(board: &Board, state: &mut SearchState, max_depth: u8) -> SearchResult {
     let mut best_move: Option<ChessMove> = None;
     let mut best_score: Score = -SCORE_INFINITY;
+    let mut completed_depth: u8 = 0;
+    let mut total_nodes: u64 = 0;
 
     for depth in 1..=max_depth {
         state.nodes = 0;
         state.root_best_move = None;
         let score = negamax(board, state, depth, 0, -SCORE_INFINITY, SCORE_INFINITY, true);
+
+        total_nodes += state.nodes;
 
         if state.is_stopped() {
             // Interrupted — only use partial result if we have nothing from a complete iteration
@@ -137,13 +141,14 @@ pub fn search(board: &Board, state: &mut SearchState, max_depth: u8) -> SearchRe
             break;
         }
 
+        completed_depth = depth;
         best_score = score;
         if let Some(mv) = state.root_best_move {
             best_move = Some(mv);
         }
 
         let elapsed_ms = state.start_time.elapsed().as_millis().max(1) as u64;
-        let nps = state.nodes * 1000 / elapsed_ms;
+        let nps = total_nodes * 1000 / elapsed_ms;
 
         // Extract PV from TT chain
         let pv = extract_pv(board, &state.tt, depth as usize);
@@ -152,7 +157,7 @@ pub fn search(board: &Board, state: &mut SearchState, max_depth: u8) -> SearchRe
         let score_str = format_score(best_score);
         println!(
             "info depth {} {} nodes {} time {} nps {} pv {}",
-            depth, score_str, state.nodes, elapsed_ms, nps, pv_str
+            depth, score_str, total_nodes, elapsed_ms, nps, pv_str
         );
 
         // Soft time limit: don't start next iteration if >50% of time used
@@ -172,8 +177,8 @@ pub fn search(board: &Board, state: &mut SearchState, max_depth: u8) -> SearchRe
     SearchResult {
         best_move,
         score: best_score,
-        depth: max_depth,
-        nodes: state.nodes,
+        depth: completed_depth,
+        nodes: total_nodes,
     }
 }
 
@@ -478,6 +483,7 @@ mod tests {
         let result = search(&board, &mut state, 2);
         let best = result.best_move.unwrap();
         assert_eq!(best.to_string(), "h5f7", "Expected Qxf7# but got {}", best);
+        assert!(result.score > SCORE_MATE - 100, "Mate score should be near SCORE_MATE, got {}", result.score);
     }
 
     #[test]
@@ -487,6 +493,8 @@ mod tests {
         let result = search(&board, &mut state, 4);
         assert!(result.best_move.is_some());
         assert!(result.nodes > 0);
+        assert_eq!(result.depth, 4, "Should complete all requested depths from startpos");
+        assert!(result.score.abs() < 100, "Startpos score should be near zero, got {}", result.score);
     }
 
     #[test]
