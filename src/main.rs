@@ -3,6 +3,7 @@
 mod board;
 mod evaluation;
 mod pst;
+mod tt;
 mod types;
 
 fn main() {
