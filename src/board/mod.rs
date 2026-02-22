@@ -1,5 +1,7 @@
+mod attacks;
 mod bitboard;
 mod chessmove;
+mod magic;
 mod piece;
 mod square;
 
