@@ -22,6 +22,7 @@ pub struct SearchState {
     pub syzygy: Option<SyzygyProber>,
     pub root_best_move: Option<ChessMove>,
     pub position_history: Vec<u64>,
+    pub silent: bool,
 }
 
 impl SearchState {
@@ -37,6 +38,7 @@ impl SearchState {
             syzygy: None,
             root_best_move: None,
             position_history: Vec::new(),
+            silent: false,
         }
     }
 
@@ -154,11 +156,13 @@ pub fn search(board: &Board, state: &mut SearchState, max_depth: u8) -> SearchRe
         let pv = extract_pv(board, &state.tt, depth as usize);
         let pv_str: String = pv.iter().map(|m| m.to_string()).collect::<Vec<_>>().join(" ");
 
-        let score_str = format_score(best_score);
-        println!(
-            "info depth {} {} nodes {} time {} nps {} pv {}",
-            depth, score_str, total_nodes, elapsed_ms, nps, pv_str
-        );
+        if !state.silent {
+            let score_str = format_score(best_score);
+            println!(
+                "info depth {} {} nodes {} time {} nps {} pv {}",
+                depth, score_str, total_nodes, elapsed_ms, nps, pv_str
+            );
+        }
 
         // Soft time limit: don't start next iteration if >50% of time used
         if state.time_limit_ms > 0 {

@@ -1,1 +1,9 @@
 pub mod board;
+pub mod evaluation;
+pub mod movegen;
+pub mod pst;
+pub mod search;
+pub mod syzygy;
+pub mod time;
+pub mod tt;
+pub mod types;
